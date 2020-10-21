@@ -182,10 +182,10 @@ class RMCSAEnv(OpticalNetworkEnv):
 
         self.logger.debug('{} assigning path {} on initial slot {} for {} slots'.format(self.service.service_id, path.node_list, initial_slot, number_slots))
         for i in range(len(path.node_list) - 1):
-            self.topology.graph['available_slots'][core, self.topology[path.node_list[i]][path.node_list[i + 1]]['index'],
-                                                                        initial_slot:initial_slot + number_slots] = 0
-            self.spectrum_slots_allocation[core, self.topology[path.node_list[i]][path.node_list[i + 1]]['index'],
-                                                    initial_slot:initial_slot + number_slots] = self.service.service_id
+            self.topology.graph['available_slots'][initial_slot:initial_slot + number_slots, core,
+                                                self.topology[path.node_list[i]][path.node_list[i + 1]]['index']] = 0
+            self.spectrum_slots_allocation[initial_slot:initial_slot + number_slots, core,
+                                                        self.topology[path.node_list[i]][path.node_list[i + 1]]['index']] = self.service.service_id
             self.topology[path.node_list[i]][path.node_list[i + 1]]['services'].append(self.service)
             self.topology[path.node_list[i]][path.node_list[i + 1]]['running_services'].append(self.service)
             self._update_link_stats(path.node_list[i], path.node_list[i + 1])
@@ -348,9 +348,9 @@ class RMCSAEnv(OpticalNetworkEnv):
             return False
         for i in range(len(path.node_list) - 1):
             if np.any(self.topology.graph['available_slots'][
+                      initial_slot:initial_slot + number_slots,
                       core,
-                      self.topology[path.node_list[i]][path.node_list[i + 1]]['index'],
-                      initial_slot:initial_slot + number_slots] == 0):
+                      self.topology[path.node_list[i]][path.node_list[i + 1]]['index']] == 0):
                 return False
         return True
 
