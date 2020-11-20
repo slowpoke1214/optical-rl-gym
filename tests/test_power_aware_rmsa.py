@@ -13,8 +13,8 @@ load = 250
 logging.getLogger('rmsacomplexenv').setLevel(logging.INFO)
 
 seed = 20
-episodes = 10
-episode_length = 100
+episodes = 5
+episode_length = 10
 
 monitor_files = []
 policies = []
