@@ -30,13 +30,13 @@ env_args = dict(topology=topology, seed=10, allow_rejection=True, load=load, mea
 
 print('STR'.ljust(5), 'REW'.rjust(7), 'STD'.rjust(7))
 
-init_env = gym.make('PowerAwareRMSA-v0', **env_args)
-env_rnd = SimpleMatrixObservation(init_env)
-mean_reward_rnd, std_reward_rnd = evaluate_heuristic(env_rnd, shortest_available_path_first_fit_fixed_power, n_eval_episodes=episodes)
-print('Rnd:'.ljust(8), f'{mean_reward_rnd:.4f}  {std_reward_rnd:>7.4f}')
-print('Bit rate blocking:', (init_env.episode_bit_rate_requested - init_env.episode_bit_rate_provisioned) / init_env.episode_bit_rate_requested)
-print('Request blocking:', (init_env.episode_services_processed - init_env.episode_services_accepted) / init_env.episode_services_processed)
-print('Throughput:', init_env.topology.graph['throughput'])
+# init_env = gym.make('PowerAwareRMSA-v0', **env_args)
+# env_rnd = SimpleMatrixObservation(init_env)
+# mean_reward_rnd, std_reward_rnd = evaluate_heuristic(env_rnd, shortest_available_path_first_fit_fixed_power, n_eval_episodes=episodes)
+# print('Rnd:'.ljust(8), f'{mean_reward_rnd:.4f}  {std_reward_rnd:>7.4f}')
+# print('Bit rate blocking:', (init_env.episode_bit_rate_requested - init_env.episode_bit_rate_provisioned) / init_env.episode_bit_rate_requested)
+# print('Request blocking:', (init_env.episode_services_processed - init_env.episode_services_accepted) / init_env.episode_services_processed)
+# print('Throughput:', init_env.topology.graph['throughput'])
 
 
 ## Random Policy

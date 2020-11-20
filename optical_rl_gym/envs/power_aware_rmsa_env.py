@@ -484,6 +484,12 @@ def least_loaded_path_first_fit(env: PowerAwareRMSA) -> int:
                 break  # breaks the loop for the initial slot
     return action
 
+def least_OPM_and_OBRM(env: PowerAwareRMSA) -> int:
+    launch_power = range(0, 15)
+    for idp, path in enumerate(env.k_shortest_paths[env.service.source, env.service.destination]):
+        num_slots = env.get_number_slots(path)
+
+    return action
 
 class SimpleMatrixObservation(gym.ObservationWrapper):
 
