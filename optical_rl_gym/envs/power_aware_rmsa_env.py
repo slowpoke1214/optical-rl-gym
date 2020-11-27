@@ -454,7 +454,7 @@ def shortest_available_path_first_fit_fixed_power(env: PowerAwareRMSA) -> int:
     Validation to find shortest available path. Finds the first fit with a given fixed power.
 
     :param env: The environment of the simulator
-    :return: action of iteration (path, spectrum resources, power)
+    :return: action of iteration (path, modulations, spectrum resources, power)
     """
     modulations = len(env.topology.graph['modulations'])
     initial_power = 6   # Fixed power variable for validation method. Gets passed through simulator.
@@ -463,7 +463,8 @@ def shortest_available_path_first_fit_fixed_power(env: PowerAwareRMSA) -> int:
         num_slots = env.get_number_slots(path)
         for initial_slot in range(0, env.topology.graph['num_spectrum_resources'] - num_slots):
             if env.is_path_free(path, initial_slot, num_slots):
-                return [idp, modulations, initial_slot, power]
+                # Returned is the best_modulation of the 'modulations' object
+                return [idp, env.topology.graph['modulations'].index(path.best_modulation), initial_slot, power]
     return [env.topology.graph['k_paths'], modulations, env.topology.graph['num_spectrum_resources'], power]
 
 
