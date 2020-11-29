@@ -47,6 +47,7 @@ class PowerAwareRMSA(OpticalNetworkEnv):
         self.bit_rate_provisioned = 0
         self.episode_bit_rate_requested = 0
         self.episode_bit_rate_provisioned = 0
+        self.total_power = 0
 
         self.bit_rate_lower_bound = bit_rate_lower_bound
         self.bit_rate_higher_bound = bit_rate_higher_bound
@@ -159,6 +160,7 @@ class PowerAwareRMSA(OpticalNetworkEnv):
 
         self.bit_rate_requested = 0
         self.bit_rate_provisioned = 0
+        self.total_power = 0
 
         self.topology.graph["available_slots"] = np.ones((self.topology.number_of_edges(), self.num_spectrum_resources),
                                                          dtype=int)
@@ -206,6 +208,7 @@ class PowerAwareRMSA(OpticalNetworkEnv):
         self.episode_services_accepted += 1
         self.bit_rate_provisioned += self.service.bit_rate
         self.episode_bit_rate_provisioned += self.service.bit_rate
+        self.total_power += self.service.launch_power
 
     def _release_path(self, service: Service):
         for i in range(len(service.route.node_list) - 1):
