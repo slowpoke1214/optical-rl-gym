@@ -38,6 +38,8 @@ mean_reward_rnd, std_reward_rnd = evaluate_heuristic(env_rnd, random_policy, n_e
 print('Rnd:'.ljust(8), f'{mean_reward_rnd:.4f}  {std_reward_rnd:>7.4f}')
 print('Bit rate blocking:', (init_env.episode_bit_rate_requested - init_env.episode_bit_rate_provisioned) / init_env.episode_bit_rate_requested)
 print('Request blocking:', (init_env.episode_services_processed - init_env.episode_services_accepted) / init_env.episode_services_processed)
+print('Total power:', init_env.total_power)
+print('Average power:', init_env.total_power / init_env.services_accepted)
 
 # Shortest Available Path First Fit Fixed Power
 init_env = gym.make('PowerAwareRMSA-v0', **env_args)
@@ -47,6 +49,8 @@ print('SAP-FF-FP:'.ljust(8), f'{mean_reward_sapfffp:.4f}  {std_reward_sapfffp:>7
 print('Bit rate blocking:', (init_env.episode_bit_rate_requested - init_env.episode_bit_rate_provisioned) / init_env.episode_bit_rate_requested)
 print('Request blocking:', (init_env.episode_services_processed - init_env.episode_services_accepted) / init_env.episode_services_processed)
 print('Throughput:', init_env.topology.graph['throughput'])
+print('Total power:', init_env.total_power)
+print('Average power:', init_env.total_power / init_env.services_accepted)
 
 # env_sp = gym.make('PowerAwareRMSA-v0', **env_args)
 # mean_reward_sp, std_reward_sp = evaluate_heuristic(env_sp, shortest_path_first_fit, n_eval_episodes=episodes)
