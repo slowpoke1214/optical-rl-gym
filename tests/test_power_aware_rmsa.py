@@ -32,14 +32,14 @@ print('STR'.ljust(5), 'REW'.rjust(7), 'STD'.rjust(7))
 
 
 # Random Policy
-init_env = gym.make('PowerAwareRMSA-v0', **env_args)
-env_rnd = SimpleMatrixObservation(init_env)
-mean_reward_rnd, std_reward_rnd = evaluate_heuristic(env_rnd, random_policy, n_eval_episodes=episodes)
-print('Rnd:'.ljust(8), f'{mean_reward_rnd:.4f}  {std_reward_rnd:>7.4f}')
-print('Bit rate blocking:', (init_env.episode_bit_rate_requested - init_env.episode_bit_rate_provisioned) / init_env.episode_bit_rate_requested)
-print('Request blocking:', (init_env.episode_services_processed - init_env.episode_services_accepted) / init_env.episode_services_processed)
-print('Total power:', init_env.total_power)
-print('Average power:', init_env.total_power / init_env.services_accepted)
+# init_env = gym.make('PowerAwareRMSA-v0', **env_args)
+# env_rnd = SimpleMatrixObservation(init_env)
+# mean_reward_rnd, std_reward_rnd = evaluate_heuristic(env_rnd, random_policy, n_eval_episodes=episodes)
+# print('Rnd:'.ljust(8), f'{mean_reward_rnd:.4f}  {std_reward_rnd:>7.4f}')
+# print('Bit rate blocking:', (init_env.episode_bit_rate_requested - init_env.episode_bit_rate_provisioned) / init_env.episode_bit_rate_requested)
+# print('Request blocking:', (init_env.episode_services_processed - init_env.episode_services_accepted) / init_env.episode_services_processed)
+# print('Total power:', 10 * np.log10(init_env.total_power))
+# print('Average power:', 10 * np.log10(init_env.total_power / init_env.services_accepted))
 
 # Shortest Available Path First Fit Fixed Power
 init_env = gym.make('PowerAwareRMSA-v0', **env_args)
