@@ -208,7 +208,7 @@ class PowerAwareRMSA(OpticalNetworkEnv):
         self.episode_services_accepted += 1
         self.bit_rate_provisioned += self.service.bit_rate
         self.episode_bit_rate_provisioned += self.service.bit_rate
-        self.total_power += self.service.launch_power
+        self.total_power += 10**(self.service.launch_power / 10)  # store total power in mW
 
     def _release_path(self, service: Service):
         for i in range(len(service.route.node_list) - 1):
@@ -452,7 +452,7 @@ def shortest_available_path_first_fit_fixed_power(env: PowerAwareRMSA) -> int:
     :param env: The environment of the simulator
     :return: action of iteration (path, spectrum resources, power)
     """
-    power = 5   # Fixed power variable for validation method. Gets passed through simulator.
+    power = 0   # Fixed power variable for validation method. Gets passed through simulator.
     for idp, path in enumerate(env.k_shortest_paths[env.service.source, env.service.destination]):
         num_slots = env.get_number_slots(path)
         for initial_slot in range(0, env.topology.graph['num_spectrum_resources'] - num_slots):
