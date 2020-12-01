@@ -1,16 +1,13 @@
-import json
-import os
-
 from gnpy.core.elements import Transceiver, Fiber, Edfa, Roadm
+from gnpy.core.utils import db2lin
 from gnpy.core.info import create_input_spectral_information
 from gnpy.core.network import build_network
-from gnpy.tools.json_io import load_equipment, network_from_json
-from networkx import dijkstra_path
-import time
+from networkx import neighbors
 
 
 def topology_to_json(topology):
-    """ Load a NetworkX topology and transform it into GNPy JSON """
+    """ Load a NetworkX topology and transform it into GNPy JSON
+        topology: NetworkX topology """
     data = {
         "elements": [],
         "connections": []
@@ -43,41 +40,54 @@ def topology_to_json(topology):
                                        "to_node": f"Fiber ({node} \u2192 {connected_node})"})
             data["connections"].append({"from_node": f"Fiber ({node} \u2192 {connected_node})",
                                        "to_node": connected_node})
-
     return data
 
 
-def propagation(input_power, con_in, con_out, source, dest, network, eqpt):
-    """ Create network topology from JSON and outputs SNR based on inputs """
-    # if not os.path.exists("topology_data.json"):
-    #     topology_to_json(topology)
-    # with open("topology_data.json") as d:
-    #     json_data = json.load(d)
-    # network = network_from_json(json_data, eqpt)
+def propagation(input_power, network, sim_path, initial_slot, num_slots, eqpt):
+    """ Calculate and output SNR based on inputs
+        input_power: Power in decibels
+        network: Network created from GNPy topology
+        sim_path: list of nodes service will travel through
+        num_slots: number of slots in service
+        eqpt: equipment library for GNPy """
     build_network(network, eqpt, 0, 20)
 
-    # parametrize the network elements with the con losses and adapt gain
-    # (assumes all spans are identical)
-    for e in network.nodes():
-        if isinstance(e, Fiber):
-            loss = e.params.loss_coef * e.params.length
-            e.params.con_in = con_in
-            e.params.con_out = con_out
-        if isinstance(e, Edfa):
-            e.operational.gain_target = loss + con_in + con_out
-
+    # Store network elements
     transceivers = {n.uid: n for n in network.nodes() if isinstance(n, Transceiver)}
+    fibers = {n.uid: n for n in network.nodes() if isinstance(n, Fiber)}
+    edfas = {n.uid: n for n in network.nodes() if isinstance(n, Edfa)}
 
+    # Values to create Spectral Information object
+    spacing = 12.5e9
+    min_freq = 195942783006536 + initial_slot * spacing
+    max_freq = min_freq + (num_slots - 1) * spacing
     p = input_power
-    # values from GNPy test_propagation.py
-    spacing = 50e9  # THz
-    si = create_input_spectral_information(191.3e12, 191.3e12 + 79 * spacing, 0.15, 32e9, p, spacing)
+    p = db2lin(p) * 1e-3
+    si = create_input_spectral_information(min_freq, max_freq, 0.15, 32e9, p, spacing)
 
-    source_node = next(transceivers[uid] for uid in transceivers if uid == source)
-    sink = next(transceivers[uid] for uid in transceivers if uid == dest)
-    path = dijkstra_path(network, source_node, sink)
+    # Recreate path in the GNPy network using node list from simulator
+    path = []
 
+    for index, node in enumerate(sim_path):
+        # add transceiver to path
+        path.append(transceivers[node])
+        # add fiber connecting transceivers to path, unless source transceiver is last in path
+        if index + 1 < len(sim_path):
+            fiber_str = f"Fiber ({node} \u2192 {sim_path[index+1]})"
+            for uid in fibers:
+                # add all fibers to path even if they are split up
+                if uid[0:len(fiber_str)] == fiber_str:
+                    path.append(fibers[uid])
+                    # add amplifier to path, if necessary
+                    edfa = f"Edfa0_{uid}"
+                    fiber_neighbors = [n.uid for n in neighbors(network, fibers[uid])]
+                    if edfa in edfas and edfa in fiber_neighbors:
+                        path.append(edfas[edfa])
+
+    # Calculate effects of physical layer impairments
     for el in path:
         si = el(si)
 
-    return sink.snr
+    destination_node = path[-1]
+
+    return destination_node.snr
