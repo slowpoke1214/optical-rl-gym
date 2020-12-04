@@ -2,6 +2,7 @@ from gnpy.core.elements import Transceiver, Fiber, Edfa, Roadm
 from gnpy.core.utils import db2lin
 from gnpy.core.info import create_input_spectral_information
 from gnpy.core.network import build_network
+from gnpy.tools.json_io import load_equipment, network_from_json
 from networkx import neighbors
 
 
@@ -41,6 +42,14 @@ def topology_to_json(topology):
             data["connections"].append({"from_node": f"Fiber ({node} \u2192 {connected_node})",
                                        "to_node": connected_node})
     return data
+
+
+def load_files(gnpy_topology):
+    """ Load GNPy equipment Library and create network from topology"""
+    eqpt_library = load_equipment('../examples/default_equipment_data/eqpt_config.json')
+    gnpy_network = network_from_json(topology_to_json(gnpy_topology), eqpt_library)
+
+    return eqpt_library, gnpy_network
 
 
 def propagation(input_power, network, sim_path, initial_slot, num_slots, eqpt):

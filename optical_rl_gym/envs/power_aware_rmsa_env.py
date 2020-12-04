@@ -8,8 +8,7 @@ import numpy as np
 
 from optical_rl_gym.utils import Service, Path
 from .optical_network_env import OpticalNetworkEnv
-from optical_rl_gym.gnpy_utils import propagation, topology_to_json
-from gnpy.tools.json_io import load_equipment, network_from_json
+from optical_rl_gym.gnpy_utils import propagation, topology_to_json, load_files
 
 
 class PowerAwareRMSA(OpticalNetworkEnv):
@@ -40,8 +39,7 @@ class PowerAwareRMSA(OpticalNetworkEnv):
                          k_paths=k_paths)
         assert 'modulations' in self.topology.graph
         # load gnpy equipment file and create network
-        self.eqpt_library = load_equipment('../examples/default_equipment_data/eqpt_config.json')
-        self.gnpy_network = network_from_json(topology_to_json(self.topology), self.eqpt_library)
+        self.eqpt_library, self.gnpy_network = load_files(self.topology)
         # specific attributes for elastic optical networks
         self.bit_rate_requested = 0
         self.bit_rate_provisioned = 0
