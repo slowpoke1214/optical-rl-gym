@@ -1,5 +1,5 @@
 from gnpy.core.elements import Transceiver, Fiber, Edfa, Roadm
-from gnpy.core.utils import db2lin
+from gnpy.core.utils import db2lin, lin2db, automatic_nch
 from gnpy.core.info import create_input_spectral_information
 from gnpy.core.network import build_network
 from gnpy.tools.json_io import load_equipment, network_from_json
@@ -59,12 +59,6 @@ def propagation(input_power, network, sim_path, initial_slot, num_slots, eqpt):
         sim_path: list of nodes service will travel through
         num_slots: number of slots in service
         eqpt: equipment library for GNPy """
-    build_network(network, eqpt, 0, 20)
-
-    # Store network elements
-    transceivers = {n.uid: n for n in network.nodes() if isinstance(n, Transceiver)}
-    fibers = {n.uid: n for n in network.nodes() if isinstance(n, Fiber)}
-    edfas = {n.uid: n for n in network.nodes() if isinstance(n, Edfa)}
 
     # Values to create Spectral Information object
     spacing = 12.5e9
@@ -73,6 +67,14 @@ def propagation(input_power, network, sim_path, initial_slot, num_slots, eqpt):
     p = input_power
     p = db2lin(p) * 1e-3
     si = create_input_spectral_information(min_freq, max_freq, 0.15, 32e9, p, spacing)
+
+    p_total_db = input_power + lin2db(automatic_nch(min_freq, max_freq, spacing))
+    build_network(network, eqpt, input_power, p_total_db)
+
+    # Store network elements
+    transceivers = {n.uid: n for n in network.nodes() if isinstance(n, Transceiver)}
+    fibers = {n.uid: n for n in network.nodes() if isinstance(n, Fiber)}
+    edfas = {n.uid: n for n in network.nodes() if isinstance(n, Edfa)}
 
     # Recreate path in the GNPy network using node list from simulator
     path = []
