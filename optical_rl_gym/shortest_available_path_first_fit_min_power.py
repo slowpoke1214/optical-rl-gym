@@ -35,7 +35,7 @@ def shortest_available_path_first_fit_fixed_power(env: PowerAwareRMSA):
     :param env: The environment of the simulator
     :return: action of iteration (path, spectrum resources, power)
     """
-    power = 100   # Fixed power variable for validation method. Gets passed through simulator.
+    power = 0   # Fixed power variable for validation method. Gets passed through simulator.
     for idp, path in enumerate(env.k_shortest_paths[env.service.source, env.service.destination]):
         num_slots = env.get_number_slots(path)
         for initial_slot in range(0, env.topology.graph['num_spectrum_resources'] - num_slots):
@@ -46,6 +46,7 @@ def shortest_available_path_first_fit_fixed_power(env: PowerAwareRMSA):
                     osnr = np.mean(propagation(i, env.gnpy_network, path.node_list, initial_slot, num_slots, env.eqpt_library))
                     if osnr >= min_osnr and i < min_power:
                         min_power = i
+                        break
                 return [idp, env.topology.graph['modulations'].index(path.best_modulation), initial_slot, min_power]
     return [env.topology.graph['k_paths'], env.topology.graph['modulations'], env.topology.graph['num_spectrum_resources'], power]
 
